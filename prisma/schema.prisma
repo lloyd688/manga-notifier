@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Manga {
+  id            Int      @id @default(autoincrement())
+  title         String
+  imageUrl      String?
+  link          String?
+  releaseDay    String?
+  releaseTime   String?
+  releaseInterval Int?     // For custom intervals (e.g., every 10 days)
+  nextReleaseDate DateTime? // Next scheduled release date
+  creator       String?    // Creator name for multi-user support
+  status        String   @default("WAITING") // WAITING (Red), PENDING (Yellow), DONE (Green)
+  lastChapter   String?
+  isFinished    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  notifications NotificationLog[]
+}
+
+model NotificationLog {
+  id        Int      @id @default(autoincrement())
+  mangaId   Int
+  message   String
+  sentAt    DateTime @default(now())
+  
+  manga     Manga    @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+}
