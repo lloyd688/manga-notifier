@@ -358,15 +358,35 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                                     <span className="text-white text-sm whitespace-nowrap">วัน</span>
                                 </div>
                             )}
-                            {/* Native Time Picker (24H) - simpler and more flexible */}
-                            <input
-                                type="time"
-                                className="bg-black border border-gray-700 p-3 rounded text-white w-1/2 text-center"
-                                value={formData.releaseTime}
-                                onChange={(e) => setFormData({ ...formData, releaseTime: e.target.value })}
-                                style={{ colorScheme: "dark" }} // Forces dark mode for the picker icon/popup
-                                required
-                            />
+                            {/* Custom 24H Time Picker (Desired: 22:00 Format) */}
+                            <div className="flex w-1/2 gap-1 items-center">
+                                <select
+                                    className="bg-black border border-gray-700 p-3 rounded text-white w-full text-center appearance-none"
+                                    value={formData.releaseTime ? formData.releaseTime.split(":")[0] : "12"}
+                                    onChange={(e) => {
+                                        const m = formData.releaseTime ? formData.releaseTime.split(":")[1] : "00";
+                                        setFormData({ ...formData, releaseTime: `${e.target.value}:${m}` });
+                                    }}
+                                >
+                                    {Array.from({ length: 24 }, (_, i) => i).map(h => {
+                                        const hStr = h.toString().padStart(2, "0");
+                                        return <option key={h} value={hStr}>{hStr}</option>;
+                                    })}
+                                </select>
+                                <span className="text-white font-bold">:</span>
+                                <select
+                                    className="bg-black border border-gray-700 p-3 rounded text-white w-full text-center appearance-none"
+                                    value={formData.releaseTime ? formData.releaseTime.split(":")[1] : "00"}
+                                    onChange={(e) => {
+                                        const h = formData.releaseTime ? formData.releaseTime.split(":")[0] : "12";
+                                        setFormData({ ...formData, releaseTime: `${h}:${e.target.value}` });
+                                    }}
+                                >
+                                    {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map(m => (
+                                        <option key={m} value={m}>{m}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <button
