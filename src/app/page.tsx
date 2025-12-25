@@ -47,10 +47,10 @@ export default async function Home() {
   return (
     <div className="py-8">
       <header className="mb-8 text-center">
-        <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-2 drop-shadow-lg glitch-effect">
+        <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight mb-2 drop-shadow-sm">
           MANGA NOTIFIER
         </h1>
-        <p className="text-gray-400 text-lg">จัดการงานตารางแปลมังงะของคุณ</p>
+        <p className="text-slate-500 text-lg">จัดการงานตารางแปลมังงะของคุณ</p>
       </header>
 
       <MangaDashboard initialManga={mangas} />
