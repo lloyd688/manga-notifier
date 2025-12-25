@@ -28,17 +28,16 @@ async function sendTelegram(message: string) {
 }
 
 async function main() {
-    console.log("🚀 Starting Manual Notification Check...");
+    // console.log("🚀 Starting Manual Notification Check...");
 
     // On Local Machine, new Date() is ALREADY Thai Time.
     const now = new Date();
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const todayName = days[now.getDay()];
 
-    console.log(`🕒 Current Time: ${now.toLocaleTimeString()} (${todayName})`);
+    // console.log(`🕒 Current Time: ${now.toLocaleTimeString()} (${todayName})`);
 
     const mangas = await prisma.manga.findMany();
-    // console.log(`📚 Total Mangas in DB: ${mangas.length}`);
 
     const toNotify = mangas.filter(m => {
         // 1. Check Day
@@ -61,7 +60,6 @@ async function main() {
         if (m.lastNotifiedAt) {
             const last = new Date(m.lastNotifiedAt);
             if (last.getDate() === now.getDate() && last.getMonth() === now.getMonth() && last.getFullYear() === now.getFullYear()) {
-                // console.log(`⏭️ ${m.title}: Already notified today.`);
                 return false;
             }
         }
@@ -69,9 +67,8 @@ async function main() {
         return true;
     });
 
-    console.log(`🔔 Mangas to Notify: ${toNotify.length}`);
-
     if (toNotify.length > 0) {
+        console.log(`🔔 Triggering ${toNotify.length} Notifications...`);
         for (const m of toNotify) {
             console.log(`Sending alert for: ${m.title}`);
             const msg = `✨ *${m.title}* \n\n🚀 ตอนใหม่มาแล้วครับ! \n🔗 [อ่านเลย](${m.link || "#"}) \n🕒 เวลา: ${m.releaseTime || "ตอนนี้"}`;
@@ -85,7 +82,46 @@ async function main() {
             });
         }
     } else {
-        console.log("😴 No mangas to notify right now.");
+        // CONFIDENCE DASHBOARD
+        // Calculate next upcoming manga for TODAY
+        const upcoming = mangas.filter(m => {
+            // Check if it's for today
+            const isDayMatch = m.releaseInterval
+                ? (m.nextReleaseDate && new Date(m.nextReleaseDate) <= now)
+                : (m.releaseDay === "Everyday" || m.releaseDay === todayName);
+
+            if (!isDayMatch) return false;
+
+            // Check if processed already
+            if (m.lastNotifiedAt) {
+                const last = new Date(m.lastNotifiedAt);
+                if (last.getDate() === now.getDate() && last.getMonth() === now.getMonth() && last.getFullYear() === now.getFullYear()) return false;
+            }
+
+            // Check if future time
+            if (!m.releaseTime) return false;
+            const [h, min] = m.releaseTime.split(":").map(Number);
+            const t = new Date();
+            t.setHours(h, min, 0, 0);
+            return t > now;
+        }).sort((a, b) => {
+            const [h1, m1] = (a.releaseTime || "00:00").split(":").map(Number);
+            const [h2, m2] = (b.releaseTime || "00:00").split(":").map(Number);
+            return (h1 * 60 + m1) - (h2 * 60 + m2);
+        });
+
+        if (upcoming.length > 0) {
+            const next = upcoming[0];
+            const [h, m] = (next.releaseTime || "00:00").split(":").map(Number);
+            const target = new Date();
+            target.setHours(h, m, 0, 0);
+            const diffMs = target.getTime() - now.getTime();
+            const diffMins = Math.ceil(diffMs / 60000); // Minutes remaining
+
+            console.log(`✅ [${now.toLocaleTimeString()}] System Active | 🎯 Next Queue: '${next.title}' in ${diffMins} mins (@ ${next.releaseTime})`);
+        } else {
+            console.log(`✅ [${now.toLocaleTimeString()}] System Active | 💤 No more schedule for today. Waiting for tomorrow.`);
+        }
     }
 }
 

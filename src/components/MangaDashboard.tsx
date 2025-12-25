@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, ExternalLink, Trash2, Check, Clock, Loader2, Upload, Pencil, X, Bell, Calendar, RefreshCcw, LogOut } from "lucide-react";
 import Image from "next/image";
 
@@ -188,6 +188,55 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
         }
     };
 
+    // Countdown Logic
+    const [nextManga, setNextManga] = useState<{ title: string, timeLeft: string } | null>(null);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const todayName = days[now.getDay()];
+
+            const upcoming = mangas.filter(m => {
+                const isDayMatch = m.releaseInterval
+                    ? (m.nextReleaseDate && new Date(m.nextReleaseDate) <= now)
+                    : (m.releaseDay === "Everyday" || m.releaseDay === todayName);
+
+                if (!isDayMatch || !m.releaseTime) return false;
+
+                const [h, min] = m.releaseTime.split(":").map(Number);
+                const t = new Date();
+                t.setHours(h, min, 0, 0);
+                return t > now;
+            }).sort((a, b) => {
+                const [h1, m1] = (a.releaseTime || "00:00").split(":").map(Number);
+                const [h2, m2] = (b.releaseTime || "00:00").split(":").map(Number);
+                return (h1 * 60 + m1) - (h2 * 60 + m2);
+            });
+
+            if (upcoming.length > 0) {
+                const next = upcoming[0];
+                const [h, m] = (next.releaseTime || "00:00").split(":").map(Number);
+                const target = new Date();
+                target.setHours(h, m, 0, 0);
+
+                const diff = target.getTime() - now.getTime();
+                const totalSecs = Math.floor(diff / 1000);
+                const hours = Math.floor(totalSecs / 3600);
+                const mins = Math.floor((totalSecs % 3600) / 60);
+                const secs = totalSecs % 60;
+
+                setNextManga({
+                    title: next.title,
+                    timeLeft: `${hours > 0 ? hours + 'h ' : ''}${mins}m ${secs}s`
+                });
+            } else {
+                setNextManga(null);
+            }
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [mangas]);
+
     const filteredMangas = mangas.filter(m => {
         const matchesToday = !showTodayOnly || m.releaseDay === new Date().toLocaleDateString('en-US', { weekday: 'long' });
         const matchesCreator = selectedCreator === "All" || (m.creator || "ส่วนกลาง (Public)") === selectedCreator;
@@ -207,6 +256,22 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                         <p className="text-xs font-medium tracking-[0.2em] text-cyan-200/70 uppercase">
                             ระบบจัดการงานตารางแปลสุดล้ำ
                         </p>
+
+                        {/* Countdown Widget */}
+                        {nextManga && (
+                            <div className="mt-2 flex items-center gap-3 bg-black/60 px-4 py-2 rounded-xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] animate-pulse w-max">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+                                </span>
+                                <div className="flex flex-col leading-none">
+                                    <span className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">Next Drop</span>
+                                    <span className="text-sm font-bold text-white">
+                                        {nextManga.title} <span className="text-cyan-400">({nextManga.timeLeft})</span>
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2 ml-4">
