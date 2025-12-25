@@ -65,7 +65,7 @@ export async function GET() {
 
                 for (const m of grouped[day]) {
                     const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
-                    const msg = `📢 *${m.title}*
+                    const msg = `📢 *${m.title}* (Ver. Filter: ${todayName})
 🗓 ${day} @ ${m.releaseTime}${creatorTxt}
 🔗 [คลิกอ่านเลย](${m.link || "#"})`;
 
