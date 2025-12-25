@@ -197,60 +197,61 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     <div className="flex flex-col">
-                        <h2 className="text-3xl font-extrabold flex items-center gap-2">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">
+                        <h2 className="text-4xl font-display font-extrabold flex items-center gap-3 tracking-wide">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_15px_rgba(6,182,212,0.6)] animate-pulse">
                                 {showTodayOnly ? "งานวันนี้" : "MANGA NOTIFIER"}
                             </span>
-                            <span className="drop-shadow-none text-white filter-none">
-                                {showTodayOnly ? "🔥" : "✨"}
-                            </span>
                         </h2>
-                        <p className="text-[10px] font-medium tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 opacity-80 uppercase">
-                            จัดการงานตารางแปลมังงะของคุณ
+                        <p className="text-xs font-medium tracking-[0.2em] text-cyan-200/70 uppercase">
+                            ระบบจัดการงานตารางแปลสุดล้ำ
                         </p>
                     </div>
 
-                    <button
-                        onClick={handleLogout}
-                        className="p-2.5 rounded-full text-white transition transform hover:scale-105 shadow-[0_0_15px_rgba(239,68,68,0.5)] bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500"
-                        title="ออกจากระบบ"
-                    >
-                        <LogOut size={20} />
-                    </button>
+                    <div className="flex items-center gap-2 ml-4">
+                        <button
+                            onClick={handleLogout}
+                            className="p-3 rounded-full text-white/90 transition-all hover:scale-110 shadow-lg bg-white/5 hover:bg-red-500/20 border border-white/10 backdrop-blur-md"
+                            title="ออกจากระบบ"
+                        >
+                            <LogOut size={18} />
+                        </button>
+
+                        <button
+                            onClick={handleNotify}
+                            className="p-3 rounded-full text-white/90 transition-all hover:scale-110 shadow-[0_0_20px_rgba(59,130,246,0.4)] bg-gradient-to-br from-blue-600 to-indigo-700 hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] border border-white/20"
+                            title="แจ้งเตือน Telegram เดี๋ยวนี้"
+                        >
+                            <Bell size={18} />
+                        </button>
+                    </div>
+
+                    <div className="h-8 w-px bg-white/10 mx-2" />
 
                     <button
-                        onClick={handleNotify}
-                        className="p-2.5 rounded-full text-white transition transform hover:scale-105 shadow-[0_0_15px_rgba(59,130,246,0.5)] bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500"
-                        title="แจ้งเตือน Telegram เดี๋ยวนี้"
-                    >
-                        <Bell size={20} />
-                    </button>
-                    <button
                         onClick={() => setShowTodayOnly(!showTodayOnly)}
-                        className={`px-4 py-2 rounded-xl flex items-center gap-2 transition transform hover:scale-105 text-sm font-bold shadow-lg ${showTodayOnly
-                            ? "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.5)]"
-                            : "bg-gray-800 text-gray-400 border border-gray-700 hover:border-gray-500 hover:text-white"
+                        className={`px-5 py-2.5 rounded-2xl flex items-center gap-2 transition-all duration-300 hover:scale-105 font-bold shadow-lg border backdrop-blur-xl ${showTodayOnly
+                            ? "bg-gradient-to-r from-fuchsia-600 to-pink-600 border-white/20 text-white shadow-[0_0_20px_rgba(217,70,239,0.5)]"
+                            : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
                             }`}
-                        title="แสดงเฉพาะงานวันนี้"
                     >
                         <Calendar size={18} />
-                        <span>ตารางวันนี้</span>
+                        <span>{showTodayOnly ? "งานวันนี้ 🔥" : "ตารางงาน"}</span>
                     </button>
 
                     <div className="relative group">
                         <select
                             value={selectedCreator}
                             onChange={(e) => setSelectedCreator(e.target.value)}
-                            className="appearance-none bg-gray-800 text-white px-4 py-2 rounded-xl font-bold border border-gray-700 hover:border-gray-500 transition cursor-pointer pr-8"
+                            className="appearance-none bg-black/40 text-white px-5 py-2.5 rounded-2xl font-bold border border-white/10 hover:border-blue-500/50 transition-all cursor-pointer pr-10 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                         >
-                            <option value="All">ดูงานทุกคน 👥</option>
+                            <option value="All">All Creators 👥</option>
                             {creators.map(c => (
-                                <option key={c} value={c}>{c} 👤</option>
+                                <option key={c} value={c}>{c}</option>
                             ))}
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-blue-400 group-hover:text-white transition-colors">
                             ▼
                         </div>
                     </div>
@@ -420,91 +421,107 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                             {groupMangas.map((manga) => (
                                 <div
                                     key={manga.id}
-                                    className="bg-gray-900/40 backdrop-blur-xl rounded-xl overflow-hidden shadow-lg border border-white/10 flex flex-col transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:border-cyan-500/30 hover:-translate-y-1"
+                                    className="group relative bg-[#1a1a1a]/40 backdrop-blur-md rounded-2xl overflow-hidden border border-white/5 transition-all duration-500 hover:scale-[1.02] hover:bg-[#1a1a1a]/60 hover:border-cyan-500/50 hover:shadow-[0_0_40px_rgba(6,182,212,0.15)] flex flex-col"
                                 >
-                                    <div className="relative w-full aspect-[480/623] bg-gray-800">
+                                    {/* Glass Highlight */}
+                                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                                    <div className="relative w-full aspect-[3/4] overflow-hidden">
                                         {manga.imageUrl ? (
-                                            <img src={manga.imageUrl} alt={manga.title} className="w-full h-full object-cover" />
+                                            <>
+                                                <img src={manga.imageUrl} alt={manga.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                                            </>
                                         ) : (
-                                            <div className="flex items-center justify-center h-full text-gray-500">ไม่มีรูปภาพ</div>
+                                            <div className="flex items-center justify-center h-full bg-gray-800 text-gray-500 text-xs">NO IMAGE</div>
                                         )}
-                                        <div className="absolute top-2 right-2 flex gap-1">
+
+                                        {/* Action Buttons (Floating) */}
+                                        <div className="absolute top-2 right-2 flex flex-col gap-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
                                             <button
                                                 onClick={() => handleReset(manga.id, manga.title)}
-                                                className="bg-black/50 p-2 rounded-full text-white hover:bg-blue-600 transition"
-                                                title="เริ่มตอนใหม่ (รีเซ็ตสถานะ)"
+                                                className="bg-black/70 p-2 rounded-full text-white hover:bg-cyan-500 hover:shadow-[0_0_10px_rgba(6,182,212,0.8)] transition backdrop-blur-md"
+                                                title="เริ่มตอนใหม่"
                                             >
                                                 <RefreshCcw size={16} />
                                             </button>
                                             <button
                                                 onClick={() => handleEdit(manga)}
-                                                className="bg-black/50 p-2 rounded-full text-blue-400 hover:bg-black transition"
+                                                className="bg-black/70 p-2 rounded-full text-white hover:bg-blue-500 hover:shadow-[0_0_10px_rgba(59,130,246,0.8)] transition backdrop-blur-md"
                                             >
                                                 <Pencil size={16} />
                                             </button>
-                                            <button onClick={() => handleDelete(manga.id)} className="bg-black/50 p-2 rounded-full text-red-500 hover:bg-black transition">
+                                            <button
+                                                onClick={() => handleDelete(manga.id)}
+                                                className="bg-black/70 p-2 rounded-full text-white hover:bg-red-500 hover:shadow-[0_0_10px_rgba(239,68,68,0.8)] transition backdrop-blur-md"
+                                            >
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
-                                    </div>
 
-                                    <div className="p-2 flex-1 flex flex-col">
-                                        <h3 className="text-sm font-bold mb-1 truncate" title={manga.title}>{manga.title}</h3>
-                                        <div className="flex items-center gap-1 text-gray-400 text-[10px] mb-1">
-                                            <Clock size={10} />
-                                            <span>
-                                                {manga.releaseInterval
-                                                    ? `ทุกๆ ${manga.releaseInterval} วัน`
-                                                    : `${DAY_TRANSLATION[manga.releaseDay || ""] || manga.releaseDay}`
-                                                }
-                                                {manga.releaseTime ? ` ${manga.releaseTime} น.` : ""}
+                                        {/* Status Badge */}
+                                        <div className="absolute top-2 left-2">
+                                            <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-lg backdrop-blur-md border ${manga.status === "WAITING" ? "bg-red-500/20 text-red-200 border-red-500/50" :
+                                                manga.status === "PENDING" ? "bg-yellow-500/20 text-yellow-200 border-yellow-500/50" :
+                                                    "bg-teal-500/20 text-teal-200 border-teal-500/50"
+                                                }`}>
+                                                {manga.status === "WAITING" ? "WAITING" :
+                                                    manga.status === "PENDING" ? "WORKING" :
+                                                        "DONE"}
                                             </span>
                                         </div>
+                                    </div>
+
+                                    <div className="p-4 flex-1 flex flex-col gap-2">
+                                        <h3 className="text-base font-bold text-white leading-tight line-clamp-2 group-hover:text-cyan-400 transition-colors" title={manga.title}>
+                                            {manga.title}
+                                        </h3>
+
+                                        <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
+                                            <Clock size={12} className="text-cyan-500" />
+                                            <span className="bg-white/5 px-2 py-0.5 rounded text-white/70">
+                                                {manga.releaseInterval
+                                                    ? `Every ${manga.releaseInterval} days`
+                                                    : `${DAY_TRANSLATION[manga.releaseDay || ""] || manga.releaseDay}`
+                                                }
+                                                {manga.releaseTime ? ` @ ${manga.releaseTime}` : ""}
+                                            </span>
+                                        </div>
+
                                         {manga.link && (
-                                            <a href={manga.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-400 hover:underline mb-1 text-[10px]">
-                                                <ExternalLink size={10} /> ไปยังลิงก์
+                                            <a href={manga.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition w-max">
+                                                <ExternalLink size={10} /> Link
                                             </a>
                                         )}
+                                    </div>
 
-                                        <div className="mt-auto pt-1 border-t border-gray-800">
-                                            <div className="flex flex-col gap-1 bg-black/30 p-1.5 rounded-lg">
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <span className="text-xs text-gray-400">สถานะ:</span>
-                                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${manga.status === "WAITING" ? "bg-red-500/20 text-red-300 border border-red-500/50" :
-                                                        manga.status === "PENDING" ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/50" :
-                                                            "bg-green-500/20 text-green-300 border border-green-500/50"
-                                                        }`}>
-                                                        {manga.status === "WAITING" ? "ยังไม่ทำ" :
-                                                            manga.status === "PENDING" ? "กำลังทำ" :
-                                                                "สำเร็จ"}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    {/* Status Buttons - Show for everyone? Or restrictive? Let's show for everyone for now as per "Public Dashboard" request */}
-                                                    <div className="flex gap-1 w-full justify-between">
-                                                        <button
-                                                            onClick={() => handleStatusChange(manga.id, "WAITING")}
-                                                            className={`flex-1 h-5 rounded flex items-center justify-center transition text-[8px] ${manga.status === "WAITING" ? "bg-red-900/50 text-red-200 border border-red-500" : "bg-gray-800 text-gray-500 border border-transparent hover:border-gray-600"}`}
-                                                            title="ยังไม่ทำ"
-                                                        >
-                                                            ยังไม่ทำ
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusChange(manga.id, "PENDING")}
-                                                            className={`flex-1 h-5 rounded flex items-center justify-center transition text-[8px] ${manga.status === "PENDING" ? "bg-yellow-900/50 text-yellow-200 border border-yellow-500" : "bg-gray-800 text-gray-500 border border-transparent hover:border-gray-600"}`}
-                                                            title="กำลังดำเนินการ"
-                                                        >
-                                                            กำลังทำ
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleStatusChange(manga.id, "DONE")}
-                                                            className={`flex-1 h-5 rounded flex items-center justify-center transition text-[8px] ${manga.status === "DONE" ? "bg-green-900/50 text-green-200 border border-green-500" : "bg-gray-800 text-gray-500 border border-transparent hover:border-gray-600"}`}
-                                                            title="สำเร็จ"
-                                                        >
-                                                            เสร็จแล้ว
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                    <div className="mt-auto pt-3 border-t border-white/5">
+                                        <div className="flex flex-col gap-2 bg-black/20 p-2 rounded-xl backdrop-blur-sm">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status Control</span>
+                                            </div>
+                                            <div className="flex gap-1 w-full justify-between">
+                                                <button
+                                                    onClick={() => handleStatusChange(manga.id, "WAITING")}
+                                                    className={`flex-1 h-6 rounded-lg flex items-center justify-center transition-all duration-300 text-[9px] font-bold uppercase tracking-wider ${manga.status === "WAITING" ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] text-white" : "bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-200"}`}
+                                                    title="ยังไม่ทำ"
+                                                >
+                                                    Wait
+                                                </button>
+                                                <button
+                                                    onClick={() => handleStatusChange(manga.id, "PENDING")}
+                                                    className={`flex-1 h-6 rounded-lg flex items-center justify-center transition-all duration-300 text-[9px] font-bold uppercase tracking-wider ${manga.status === "PENDING" ? "bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)] text-black" : "bg-white/5 text-gray-400 hover:bg-yellow-500/20 hover:text-yellow-200"}`}
+                                                    title="กำลังดำเนินการ"
+                                                >
+                                                    WIP
+                                                </button>
+                                                <button
+                                                    onClick={() => handleStatusChange(manga.id, "DONE")}
+                                                    className={`flex-1 h-6 rounded-lg flex items-center justify-center transition-all duration-300 text-[9px] font-bold uppercase tracking-wider ${manga.status === "DONE" ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)] text-white" : "bg-white/5 text-gray-400 hover:bg-green-500/20 hover:text-green-200"}`}
+                                                    title="สำเร็จ"
+                                                >
+                                                    Done
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -520,6 +537,6 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Chonburi } from "next/font/google";
+import { Chonburi, Prompt } from "next/font/google"; // Import Prompt
 import "./globals.css";
 
 const chonburi = Chonburi({
   weight: "400",
   subsets: ["thai", "latin"],
   variable: "--font-chonburi",
+});
+
+const prompt = Prompt({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["thai", "latin"],
+  variable: "--font-prompt",
 });
 
 export const metadata: Metadata = {
@@ -21,14 +27,16 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body
-        className={`${chonburi.variable} font-chonburi bg-black text-gray-200 antialiased relative overflow-x-hidden`}
+        className={`${chonburi.variable} ${prompt.variable} font-prompt bg-[#0a0a0a] text-white antialiased relative overflow-x-hidden`}
       >
-        {/* Ambient Background Effects */}
-        <div className="fixed inset-0 -z-10 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/40 rounded-full blur-[100px] opacity-70 animate-pulse" />
-          <div className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] bg-blue-900/40 rounded-full blur-[100px] opacity-60" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-900/40 rounded-full blur-[120px] opacity-70" />
-          <div className="absolute bottom-[20%] left-[-5%] w-[400px] h-[400px] bg-cyan-900/40 rounded-full blur-[100px] opacity-60" />
+        {/* Living Background */}
+        <div className="fixed inset-0 -z-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-black to-black" />
+
+        {/* Animated Mesh Gradient */}
+        <div className="fixed inset-0 -z-10 opacity-60">
+          <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] rounded-full bg-blue-600/20 blur-[120px] mix-blend-screen animate-blob" />
+          <div className="absolute top-[-10%] right-[-10%] w-[80%] h-[80%] rounded-full bg-purple-600/20 blur-[120px] mix-blend-screen animate-blob animation-delay-2000" />
+          <div className="absolute bottom-[-20%] left-[20%] w-[80%] h-[80%] rounded-full bg-pink-600/20 blur-[120px] mix-blend-screen animate-blob animation-delay-4000" />
         </div>
 
         <main className="min-h-screen container mx-auto p-4 z-10 relative">
