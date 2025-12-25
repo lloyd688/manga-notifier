@@ -19,85 +19,91 @@ export async function GET() {
         const now = new Date();
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const todayName = days[now.getDay()];
+        // ------------------------------------------------------------------
+        // NEW LOGIC: "Smart Daily Check"
+        // 1. Get Today's Day
+        // 2. Filter Mangas for Today
+        // 3. Logic:
+        //    - If "Everyday" -> Send if not sent today + Time passed
+        //    - If "Weekly" (e.g. Tuesday) -> Send if not sent today + Time passed
+        //    - If "Custom" -> Send if Date reached + Time passed
+        // ------------------------------------------------------------------
+
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        const currentTimeVal = currentHour * 60 + currentMinute; // Minutes since midnight
+
+        const isTimeReady = (releaseTimeStr: string | null) => {
+            if (!releaseTimeStr) return true; // No time set? Send it early.
+            const [h, m] = releaseTimeStr.split(":").map(Number);
+            const targetTimeVal = h * 60 + m;
+            return currentTimeVal >= targetTimeVal;
+        };
+
+        const isAlreadyNotifiedToday = (lastNotified: Date | null) => {
+            if (!lastNotified) return false;
+            const notificationDate = new Date(lastNotified);
+            notificationDate.setHours(0, 0, 0, 0);
+            return notificationDate.getTime() === todayStart.getTime();
+        };
 
         const filteredMangas = mangas.filter(m => {
-            // 1. Custom Schedule
-            if (m.releaseInterval && m.nextReleaseDate) {
-                // Show if Due Date is passed or today
-                return new Date(m.nextReleaseDate) <= now;
-            }
+            // A. Check if it matches TODAY
+            const matchesDay = m.releaseInterval
+                ? (m.nextReleaseDate && new Date(m.nextReleaseDate) <= now) // Custom: Date Reached
+                : (m.releaseDay === "Everyday" || m.releaseDay === todayName); // Weekly: Day Name
 
-            // 2. Weekly Schedule
-            // Only show if day matches TODAY or is "Everyday"
-            if (m.releaseDay === "Everyday") return true;
-            return m.releaseDay === todayName;
+            if (!matchesDay) return false;
+
+            // B. Check if Time is Reached
+            if (!isTimeReady(m.releaseTime)) return false;
+
+            // C. Check if Already Notified Today
+            if (isAlreadyNotifiedToday(m.lastNotifiedAt)) return false;
+
+            return true;
         });
 
-        if (filteredMangas.length === 0) {
-            return NextResponse.json({ success: true, notifiedCount: 0, message: "No manga due." });
-        }
-
-        // Sort by Day
-        const daysOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Everyday"];
-        const grouped: Record<string, typeof mangas> = {};
-        const customGroup: typeof mangas = [];
-
-        filteredMangas.forEach(m => {
-            if (m.releaseInterval) {
-                customGroup.push(m);
-            } else {
-                const day = m.releaseDay || "Unknown";
-                if (!grouped[day]) grouped[day] = [];
-                grouped[day].push(m);
-            }
-        });
-
-        // Initialize header message? Maybe not needed if 1 per story. 
-        // User asked for "1 per story", implying no big header needed, or maybe just the story details.
+        console.log(`[Notify] Found ${filteredMangas.length} manga to notify.`);
 
         let sentCount = 0;
 
-        // 1. Send Standard Weekly Items
-        for (const day of daysOrder) {
-            if (grouped[day] && grouped[day].length > 0) {
-                // Determine Day Name (Thai could be better here?)
-                // Keep it English for now to match current logic.
-
-                for (const m of grouped[day]) {
-                    const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
-                    const msg = `📢 *${m.title}* (Ver. Filter: ${todayName})
-🗓 ${day} @ ${m.releaseTime}${creatorTxt}
+        for (const m of filteredMangas) {
+            const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
+            const msg = `📢 *${m.title}* (Ver. Smart: ${todayName})
+🗓 ${m.releaseInterval ? 'Custom' : (m.releaseDay || 'Daily')} @ ${m.releaseTime || 'Anytime'}${creatorTxt}
 🔗 [คลิกอ่านเลย](${m.link || "#"})`;
 
-                    await sendTelegramMessage(msg);
-                    sentCount++;
+            const success = await sendTelegramMessage(msg);
+
+            if (success) {
+                sentCount++;
+                // Update Database (Mark as Sent)
+                // Use a simplified update to avoid locking issues, or just fire and forget await
+                await prisma.manga.update({
+                    where: { id: m.id },
+                    data: { lastNotifiedAt: new Date() }
+                });
+
+                // If Custom Interval, verify/update next date
+                if (m.releaseInterval && m.nextReleaseDate) {
+                    const nextDate = new Date(m.nextReleaseDate);
+                    nextDate.setDate(nextDate.getDate() + m.releaseInterval);
+                    await prisma.manga.update({
+                        where: { id: m.id },
+                        data: { nextReleaseDate: nextDate }
+                    });
                 }
             }
         }
 
-        // 2. Send Custom Schedule Items
-        if (customGroup.length > 0) {
-            for (const m of customGroup) {
-                const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
-                const msg = `📢 *${m.title}*
-🗓 Custom Schedule @ ${m.releaseTime}${creatorTxt}
-🔗 [คลิกอ่านเลย](${m.link || "#"})`;
-
-                await sendTelegramMessage(msg);
-                sentCount++;
-            }
-        }
-
-        const success = sentCount > 0;
-
-        return NextResponse.json({
-            success,
-            notifiedCount: mangas.length,
-            mangas: mangas.map(m => m.title)
-        });
+        return NextResponse.json({ success: true, notifiedCount: sentCount, message: `Sent ${sentCount} notifications` });
 
     } catch (error) {
         console.error("Notify Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
     }
 }
