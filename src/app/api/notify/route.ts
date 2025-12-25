@@ -77,9 +77,7 @@ export async function GET() {
 
         for (const m of filteredMangas) {
             const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
-            const msg = `📢 *${m.title}* (Ver. Smart: ${todayName})
-🗓 ${m.releaseInterval ? 'Custom' : (m.releaseDay || 'Daily')} @ ${m.releaseTime || 'Anytime'}${creatorTxt}
-🔗 [คลิกอ่านเลย](${m.link || "#"})`;
+            const msg = `✨ *${m.title}* ${creatorTxt} \n\n🚀 ตอนใหม่มาแล้วครับ! \n🔗 [อ่านเลย](${m.link || "#"}) \n🕒 เวลา: ${m.releaseTime || "ตอนนี้"}`;
 
             const success = await sendTelegramMessage(msg);
 
