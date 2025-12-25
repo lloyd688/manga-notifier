@@ -15,18 +15,22 @@ export async function GET() {
             }
         });
 
-        // Filter for Custom Schedules
+        // Filter for "Today Only"
         const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const todayName = days[now.getDay()];
 
         const filteredMangas = mangas.filter(m => {
-            if (m.releaseInterval) {
-                // If custom interval, only show if Due Date is passed or today
-                if (!m.nextReleaseDate) return true; // Fallback if no date set
-                return new Date(m.nextReleaseDate) <= new Date(); // Compare timestamps (approx) - actually safer to compare start of day if we want "due today"
-                // But simplified: date <= now is fine.
+            // 1. Custom Schedule
+            if (m.releaseInterval && m.nextReleaseDate) {
+                // Show if Due Date is passed or today
+                return new Date(m.nextReleaseDate) <= now;
             }
-            return true; // Keep weekly schedules as is (show all pending)
+
+            // 2. Weekly Schedule
+            // Only show if day matches TODAY or is "Everyday"
+            if (m.releaseDay === "Everyday") return true;
+            return m.releaseDay === todayName;
         });
 
         if (filteredMangas.length === 0) {
