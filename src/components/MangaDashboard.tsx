@@ -257,25 +257,7 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                             ระบบจัดการงานตารางแปลสุดล้ำ
                         </p>
 
-                        {/* Countdown Widget (FIXED POSITION) */}
-                        {nextManga ? (
-                            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-black/90 px-6 py-4 rounded-2xl border border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)] animate-pulse backdrop-blur-xl">
-                                <span className="relative flex h-4 w-4">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-cyan-500"></span>
-                                </span>
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider mb-1">Coming Up Next</span>
-                                    <span className="text-lg font-bold text-white">
-                                        {nextManga.title} <span className="text-cyan-400 ml-2 font-mono">({nextManga.timeLeft})</span>
-                                    </span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="fixed bottom-6 right-6 z-50 text-[10px] text-gray-400 font-mono bg-black/80 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
-                                💤 No Queue ({mangas.length} items | Today: {new Date().toLocaleDateString('en-US', { weekday: 'long' })})
-                            </div>
-                        )}
+
                     </div>
 
                     <div className="flex items-center gap-2 ml-4">
@@ -325,6 +307,27 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                         </div>
                     </div>
                 </div>
+
+                {/* Countdown Widget (Header) */}
+                {nextManga ? (
+                    <div className="ml-auto flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] animate-pulse">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                        </span>
+                        <div className="flex flex-col leading-none">
+                            <span className="text-[9px] text-cyan-300 font-bold uppercase tracking-wider">Next</span>
+                            <span className="text-sm font-bold text-white">
+                                {nextManga.title.length > 15 ? nextManga.title.substring(0, 15) + '...' : nextManga.title}
+                                <span className="text-cyan-400 ml-1 font-mono">({nextManga.timeLeft})</span>
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="ml-auto flex text-[10px] text-gray-400 font-mono bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                        💤 No Queue
+                    </div>
+                )}
                 {!isFormOpen ? (
                     <button
                         onClick={() => setIsFormOpen(true)}
