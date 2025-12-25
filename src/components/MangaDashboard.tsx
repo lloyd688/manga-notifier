@@ -481,10 +481,10 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                 }, {} as Record<string, Manga[]>)).sort((a, b) => b[0].localeCompare(a[0])).map(([groupName, groupMangas]) => (
                     <div key={groupName} className="col-span-full mb-8">
                         <div className="flex items-center gap-3 mb-4 pl-2 border-l-4 border-blue-500">
-                            <h3 className="text-2xl font-bold text-slate-800 uppercase tracking-wider">
+                            <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 uppercase tracking-wider drop-shadow-sm">
                                 {groupName}
                             </h3>
-                            <span className="bg-slate-200 text-slate-600 text-xs px-2 py-1 rounded-full font-bold">
+                            <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-2 py-1 rounded-full font-bold shadow-md">
                                 {groupMangas.length} เรื่อง
                             </span>
                         </div>
@@ -501,7 +501,7 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                                         {manga.imageUrl ? (
                                             <>
                                                 <img src={manga.imageUrl} alt={manga.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-60" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-80" />
                                             </>
                                         ) : (
                                             <div className="flex items-center justify-center h-full bg-slate-100 text-slate-400 text-xs font-bold">NO IMAGE</div>
@@ -544,7 +544,7 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                                     </div>
 
                                     <div className="p-4 flex-1 flex flex-col gap-2">
-                                        <h3 className="text-base font-bold text-slate-800 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors" title={manga.title}>
+                                        <h3 className="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-slate-800 to-slate-600 leading-tight line-clamp-2 group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300" title={manga.title}>
                                             {manga.title}
                                         </h3>
 
