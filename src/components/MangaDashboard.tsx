@@ -358,73 +358,15 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                                     <span className="text-white text-sm whitespace-nowrap">วัน</span>
                                 </div>
                             )}
-                            {/* Custom Time Picker for Thai Period (เช้า/เย็น) */}
-                            <div className="flex gap-1 w-1/2">
-                                <select
-                                    className="bg-black border border-gray-700 p-3 rounded text-white w-1/3 text-center appearance-none"
-                                    value={(() => {
-                                        if (!formData.releaseTime) return "12";
-                                        const [h] = formData.releaseTime.split(":");
-                                        let hour = parseInt(h);
-                                        if (hour === 0) return "12";
-                                        if (hour > 12) return (hour - 12).toString().padStart(2, "0");
-                                        return hour.toString().padStart(2, "0");
-                                    })()}
-                                    onChange={(e) => {
-                                        const newHour12 = parseInt(e.target.value);
-                                        const [h, m] = (formData.releaseTime || "12:00").split(":");
-                                        const currentHour24 = parseInt(h);
-                                        const isPM = currentHour24 >= 12;
-
-                                        let newHour24 = newHour12;
-                                        if (isPM && newHour12 !== 12) newHour24 += 12;
-                                        if (!isPM && newHour12 === 12) newHour24 = 0;
-
-                                        setFormData({ ...formData, releaseTime: `${newHour24.toString().padStart(2, "0")}:${m}` });
-                                    }}
-                                >
-                                    {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
-                                        <option key={h} value={h.toString().padStart(2, "0")}>{h.toString().padStart(2, "0")}</option>
-                                    ))}
-                                </select>
-                                <span className="text-white flex items-center">:</span>
-                                <select
-                                    className="bg-black border border-gray-700 p-3 rounded text-white w-1/3 text-center appearance-none"
-                                    value={formData.releaseTime ? formData.releaseTime.split(":")[1] : "00"}
-                                    onChange={(e) => {
-                                        const [h] = (formData.releaseTime || "12:00").split(":");
-                                        setFormData({ ...formData, releaseTime: `${h}:${e.target.value}` });
-                                    }}
-                                >
-                                    {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map(m => (
-                                        <option key={m} value={m}>{m}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    className="bg-black border border-gray-700 p-3 rounded text-white w-full text-center appearance-none"
-                                    value={(() => {
-                                        if (!formData.releaseTime) return "AM";
-                                        const [h] = formData.releaseTime.split(":");
-                                        return parseInt(h) >= 12 ? "PM" : "AM";
-                                    })()}
-                                    onChange={(e) => {
-                                        const newPeriod = e.target.value;
-                                        const [h, m] = (formData.releaseTime || "12:00").split(":");
-                                        let hour = parseInt(h);
-
-                                        if (newPeriod === "AM") {
-                                            if (hour >= 12) hour -= 12;
-                                        } else {
-                                            if (hour < 12) hour += 12;
-                                        }
-
-                                        setFormData({ ...formData, releaseTime: `${hour.toString().padStart(2, "0")}:${m}` });
-                                    }}
-                                >
-                                    <option value="AM">ช่วงเช้า</option>
-                                    <option value="PM">ช่วงเย็น</option>
-                                </select>
-                            </div>
+                            {/* Native Time Picker (24H) - simpler and more flexible */}
+                            <input
+                                type="time"
+                                className="bg-black border border-gray-700 p-3 rounded text-white w-1/2 text-center"
+                                value={formData.releaseTime}
+                                onChange={(e) => setFormData({ ...formData, releaseTime: e.target.value })}
+                                style={{ colorScheme: "dark" }} // Forces dark mode for the picker icon/popup
+                                required
+                            />
                         </div>
                     </div>
                     <button
