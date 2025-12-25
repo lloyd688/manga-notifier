@@ -258,7 +258,7 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                         </p>
 
                         {/* Countdown Widget */}
-                        {nextManga && (
+                        {nextManga ? (
                             <div className="mt-2 flex items-center gap-3 bg-black/60 px-4 py-2 rounded-xl border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)] animate-pulse w-max">
                                 <span className="relative flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -270,6 +270,10 @@ export default function MangaDashboard({ initialManga }: { initialManga: Manga[]
                                         {nextManga.title} <span className="text-cyan-400">({nextManga.timeLeft})</span>
                                     </span>
                                 </div>
+                            </div>
+                        ) : (
+                            <div className="mt-2 text-[10px] text-gray-500 font-mono bg-black/20 px-2 py-1 rounded border border-white/5 w-max">
+                                💤 No Queue ({mangas.length} items | Today: {new Date().toLocaleDateString('en-US', { weekday: 'long' })})
                             </div>
                         )}
                     </div>
