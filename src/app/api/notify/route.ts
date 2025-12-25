@@ -48,33 +48,43 @@ export async function GET() {
             }
         });
 
-        // Construct Message
-        let message = `📢 *งานแปลที่ต้องทำ (Manga Work)*\n`;
+        // Initialize header message? Maybe not needed if 1 per story. 
+        // User asked for "1 per story", implying no big header needed, or maybe just the story details.
 
-        daysOrder.forEach(day => {
+        let sentCount = 0;
+
+        // 1. Send Standard Weekly Items
+        for (const day of daysOrder) {
             if (grouped[day] && grouped[day].length > 0) {
-                message += `\n🗓 *${day}*\n`;
-                grouped[day].forEach(m => {
-                    const creatorTxt = m.creator ? ` (👤 ${m.creator})` : "";
-                    message += `• *${m.title}*${creatorTxt} (${m.releaseTime})\n`;
-                    if (m.link) message += `  [อ่านเลย](${m.link})\n`;
-                });
-            }
-        });
+                // Determine Day Name (Thai could be better here?)
+                // Keep it English for now to match current logic.
 
-        if (customGroup.length > 0) {
-            message += `\n🗓 *กำหนดเอง (ถึงเวลาแล้ว)*\n`;
-            customGroup.forEach(m => {
-                const creatorTxt = m.creator ? ` (👤 ${m.creator})` : "";
-                message += `• *${m.title}*${creatorTxt} (${m.releaseTime})\n`;
-                if (m.link) message += `  [อ่านเลย](${m.link})\n`;
-            });
+                for (const m of grouped[day]) {
+                    const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
+                    const msg = `📢 *${m.title}*
+🗓 ${day} @ ${m.releaseTime}${creatorTxt}
+🔗 [คลิกอ่านเลย](${m.link || "#"})`;
+
+                    await sendTelegramMessage(msg);
+                    sentCount++;
+                }
+            }
         }
 
+        // 2. Send Custom Schedule Items
+        if (customGroup.length > 0) {
+            for (const m of customGroup) {
+                const creatorTxt = m.creator ? `\n👤 *รับผิดชอบโดย:* ${m.creator}` : "";
+                const msg = `📢 *${m.title}*
+🗓 Custom Schedule @ ${m.releaseTime}${creatorTxt}
+🔗 [คลิกอ่านเลย](${m.link || "#"})`;
 
+                await sendTelegramMessage(msg);
+                sentCount++;
+            }
+        }
 
-        // Send
-        const success = await sendTelegramMessage(message);
+        const success = sentCount > 0;
 
         return NextResponse.json({
             success,
