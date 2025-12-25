@@ -55,7 +55,8 @@ export async function GET() {
             if (grouped[day] && grouped[day].length > 0) {
                 message += `\n🗓 *${day}*\n`;
                 grouped[day].forEach(m => {
-                    message += `• *${m.title}* (${m.releaseTime})\n`;
+                    const creatorTxt = m.creator ? ` (👤 ${m.creator})` : "";
+                    message += `• *${m.title}*${creatorTxt} (${m.releaseTime})\n`;
                     if (m.link) message += `  [อ่านเลย](${m.link})\n`;
                 });
             }
@@ -64,10 +65,13 @@ export async function GET() {
         if (customGroup.length > 0) {
             message += `\n🗓 *กำหนดเอง (ถึงเวลาแล้ว)*\n`;
             customGroup.forEach(m => {
-                message += `• *${m.title}* (${m.releaseTime})\n`;
+                const creatorTxt = m.creator ? ` (👤 ${m.creator})` : "";
+                message += `• *${m.title}*${creatorTxt} (${m.releaseTime})\n`;
                 if (m.link) message += `  [อ่านเลย](${m.link})\n`;
             });
         }
+
+
 
         // Send
         const success = await sendTelegramMessage(message);
