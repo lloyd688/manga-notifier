@@ -17,6 +17,10 @@ export async function GET() {
 
         // Filter for "Today Only"
         const now = new Date();
+        // FORCE ADJUST TO THAI TIME (UTC+7)
+        // Since Vercel Server is UTC, we add 7 hours to align with User's Thai Input
+        now.setHours(now.getHours() + 7);
+
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const todayName = days[now.getDay()];
         // ------------------------------------------------------------------
